@@ -1,6 +1,6 @@
 ### Cloudwatch Events ###
 # Event rule: Runs at 8pm during working days
-resource "aws_cloudwatch_event_rule" "start_instances_event_rule" = {
+resource "aws_cloudwatch_event_rule" "start_instances_event_rule" {
   name = "start_instances_event_rule"
   description = "Starts stopped EC2 instances"
   schedule_expression = "cron(0 8 ? * MON-FRI *)"
@@ -8,7 +8,7 @@ resource "aws_cloudwatch_event_rule" "start_instances_event_rule" = {
 }
 
 # Runs at 8am during working days
-resource "aws_cloudwatch_event_rule" "stop_instances_event_rule" = {
+resource "aws_cloudwatch_event_rule" "stop_instances_event_rule" {
   name = "stop_instances_event_rule"
   description = "Stops running EC2 instances"
   schedule_expression = "cron(0 20 ? * MON-FRI *)"
