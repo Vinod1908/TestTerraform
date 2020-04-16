@@ -29,7 +29,7 @@ resource "aws_cloudwatch_event_target" "stop_instances_event_target" = {
 }
 
 # AWS Lambda Permissions: Allow CloudWatch to execute the Lambda Functions
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_start_scheduler" = {
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_start_scheduler" {
   statement_id = "AllowExecutionFromCloudWatch"
   action = "lambda:InvokeFunction"
   function_name = {aws_lambda_function.ec2_start_scheduler_lambda.function_name}
@@ -37,7 +37,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_start_scheduler" = {
   source_arn = {aws_cloudwatch_event_rule.start_instances_event_rule.arn}
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_stop_scheduler" = {
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_stop_scheduler" {
   statement_id = "AllowExecutionFromCloudWatch"
   action = "lambda:InvokeFunction"
   function_name = {aws_lambda_function.ec2_stop_scheduler_lambda.function_name}
