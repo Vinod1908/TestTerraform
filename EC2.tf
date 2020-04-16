@@ -16,13 +16,13 @@ resource "aws_cloudwatch_event_rule" "stop_instances_event_rule" = {
 }
 
 # Event target: Associates a rule with a function to run
-resource "aws_cloudwatch_event_target" "start_instances_event_target" = {
+resource "aws_cloudwatch_event_target" "start_instances_event_target" {
   target_id = "start_instances_lambda_target"
   rule = {aws_cloudwatch_event_rule.start_instances_event_rule.name}
   arn = {aws_lambda_function.ec2_start_scheduler_lambda.arn}
 }
 
-resource "aws_cloudwatch_event_target" "stop_instances_event_target" = {
+resource "aws_cloudwatch_event_target" "stop_instances_event_target" {
   target_id = "stop_instances_lambda_target"
   rule = {aws_cloudwatch_event_rule.stop_instances_event_rule.name}
   arn = {aws_lambda_function.ec2_stop_scheduler_lambda.arn}
