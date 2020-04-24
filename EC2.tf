@@ -4,35 +4,57 @@ provider "aws" {
   version = "~> 2.0"
   region  = "us-east-1"
 }
-data "archive_file" "start_scheduler" {
-  type        = "zip"
-  source_file = "start_instances.py"
-  output_path = "start_instances.zip"
+resource "aws_iam_role" "ec2_start_stop_scheduler" {
+  name = "ec2_start_stop_scheduler"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
-data "archive_file" "stop_scheduler" {
-  type        = "zip"
-  source_file = "stop_instances.py"
-  output_path = "stop_instances.zip"
+data "aws_iam_policy_document" "ec2_start_stop_scheduler" {
+  statement = [
+    {
+      actions = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      resources = [
+        "arn:aws:logs:*:*:*",
+      ]
+    },
+    {
+      actions = [
+        "ec2:Describe*",
+        "ec2:Stop*",
+        "ec2:Start*"
+      ]
+      resources = [
+          "*",
+      ]
+    }
+  ]
 }
 
-# Lambda defined that runs the Python code with the specified IAM role
-resource "aws_lambda_function" "ec2_start_scheduler_lambda" {
-  filename = "${data.archive_file.start_scheduler.output_path}"
-  function_name = "start_instances"
-  role = "${aws_iam_role.ec2_start_stop_scheduler.arn}"
-  handler = "start_instances.lambda_handler"
-  runtime = "python2.7"
-  timeout = 300
-  source_code_hash = "${data.archive_file.start_scheduler.output_base64sha256}"
+resource "aws_iam_policy" "ec2_start_stop_scheduler" {
+  name = "ec2_access_scheduler"
+  path = "/"
+  policy = "${data.aws_iam_policy_document.ec2_start_stop_scheduler.json}"
 }
 
-resource "aws_lambda_function" "ec2_stop_scheduler_lambda" {
-  filename = "${data.archive_file.stop_scheduler.output_path}"
-  function_name = "stop_instances"
-  role = "${aws_iam_role.ec2_start_stop_scheduler.arn}"
-  handler = "stop_instances.lambda_handler"
-  runtime = "python2.7"
-  timeout = 300
-  source_code_hash = "${data.archive_file.stop_scheduler.output_base64sha256}"
+resource "aws_iam_role_policy_attachment" "ec2_access_scheduler" {
+  role       = "${aws_iam_role.ec2_start_stop_scheduler.name}"
+  policy_arn = "${aws_iam_policy.ec2_start_stop_scheduler.arn}"
 }
