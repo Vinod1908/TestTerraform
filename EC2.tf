@@ -4,47 +4,35 @@ provider "aws" {
   version = "~> 2.0"
   region  = "us-east-1"
 }
-resource "aws_cloudwatch_event_rule" "start_instances_event_rule" {
-  name = "start_instances_event_rule"
-  description = "Starts stopped EC2 instances"
-  schedule_expression = "cron(0 8 ? * MON-FRI *)"
-  depends_on = ["aws_lambda_function.ec2_start_scheduler_lambda"]
+data "archive_file" "start_scheduler" {
+  type        = "zip"
+  source_file = "start_instances.py"
+  output_path = "start_instances.zip"
 }
 
-# Runs at 8am during working days
-resource "aws_cloudwatch_event_rule" "stop_instances_event_rule" {
-  name = "stop_instances_event_rule"
-  description = "Stops running EC2 instances"
-  schedule_expression = "cron(0 20 ? * MON-FRI *)"
-  depends_on = ["aws_lambda_function.ec2_stop_scheduler_lambda"]
+data "archive_file" "stop_scheduler" {
+  type        = "zip"
+  source_file = "stop_instances.py"
+  output_path = "stop_instances.zip"
 }
 
-# Event target: Associates a rule with a function to run
-resource "aws_cloudwatch_event_target" "start_instances_event_target" {
-  target_id = "start_instances_lambda_target"
-  rule = "${aws_cloudwatch_event_rule.start_instances_event_rule.name}"
-  arn = "${aws_lambda_function.ec2_start_scheduler_lambda.arn}"
+# Lambda defined that runs the Python code with the specified IAM role
+resource "aws_lambda_function" "ec2_start_scheduler_lambda" {
+  filename = "${data.archive_file.start_scheduler.output_path}"
+  function_name = "start_instances"
+  role = "${aws_iam_role.ec2_start_stop_scheduler.arn}"
+  handler = "start_instances.lambda_handler"
+  runtime = "python2.7"
+  timeout = 300
+  source_code_hash = "${data.archive_file.start_scheduler.output_base64sha256}"
 }
 
-resource "aws_cloudwatch_event_target" "stop_instances_event_target" {
-  target_id = "stop_instances_lambda_target"
-  rule = "${aws_cloudwatch_event_rule.stop_instances_event_rule.name}"
-  arn = "${aws_lambda_function.ec2_stop_scheduler_lambda.arn}"
-}
-
-# AWS Lambda Permissions: Allow CloudWatch to execute the Lambda Functions
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_start_scheduler" {
-  statement_id = "AllowExecutionFromCloudWatch"
-  action = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.ec2_start_scheduler_lambda.function_name}"
-  principal = "events.amazonaws.com"
-  source_arn = "${aws_cloudwatch_event_rule.start_instances_event_rule.arn}"
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_stop_scheduler" {
-  statement_id = "AllowExecutionFromCloudWatch"
-  action = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.ec2_stop_scheduler_lambda.function_name}"
-  principal = "events.amazonaws.com"
-  source_arn = "${aws_cloudwatch_event_rule.stop_instances_event_rule.arn}"
+resource "aws_lambda_function" "ec2_stop_scheduler_lambda" {
+  filename = "${data.archive_file.stop_scheduler.output_path}"
+  function_name = "stop_instances"
+  role = "${aws_iam_role.ec2_start_stop_scheduler.arn}"
+  handler = "stop_instances.lambda_handler"
+  runtime = "python2.7"
+  timeout = 300
+  source_code_hash = "${data.archive_file.stop_scheduler.output_base64sha256}"
 }
