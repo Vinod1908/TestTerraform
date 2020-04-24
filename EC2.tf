@@ -1,5 +1,9 @@
 ### Cloudwatch Events ###
 # Event rule: Runs at 8pm during working days
+provider "aws" {
+  version = "~> 2.0"
+  region  = "us-east-1"
+}
 resource "aws_cloudwatch_event_rule" "start_instances_event_rule" {
   name = "start_instances_event_rule"
   description = "Starts stopped EC2 instances"
