@@ -1,34 +1,11 @@
-### AWS Lambda function ###
-# AWS Lambda API requires a ZIP file with the execution code
-data "archive_file" "start_scheduler" {
-  type        = "zip"
-  source_file = "start_instances.py"
-  output_path = "start_instances.zip"
-}
-
-data "archive_file" "stop_scheduler" {
-  type        = "zip"
-  source_file = "stop_instances.py"
-  output_path = "stop_instances.zip"
-}
-
-# Lambda defined that runs the Python code with the specified IAM role
-resource "aws_lambda_function" "ec2_start_scheduler_lambda" {
-  filename = {data.archive_file.start_scheduler.output_path}
-  function_name = "start_instances"
-  role = {aws_iam_role.ec2_start_stop_scheduler.arn}
-  handler = "start_instances.lambda_handler"
-  runtime = "python2.7"
-  timeout = 300
-  source_code_hash = {data.archive_file.start_scheduler.output_base64sha256}
-}
-
-resource "aws_lambda_function" "ec2_stop_scheduler_lambda" {
-  filename = {data.archive_file.stop_scheduler.output_path}
-  function_name = "stop_instances"
-  role = {aws_iam_role.ec2_start_stop_scheduler.arn}
-  handler = "stop_instances.lambda_handler"
-  runtime = "python2.7"
-  timeout = 300
-  source_code_hash = {data.archive_file.stop_scheduler.output_base64sha256}
+module "lambda-scheduler" {
+  source = "neillturner/lambda-scheduler/aws"
+  version = "0.x.0"
+  schedule_expression = "cron(5 * * * ? *)"
+  tag = "schedule"
+  schedule_tag_force = "true"
+  ec2_schedule = "true"
+  rds_schedule = "true"
+  default = "{\"mon\": {\"start\": [7], \"stop\": [19]},\"tue\": {\"start\": [7], \"stop\": [19]},\"wed\": {\"start\": [9, 22], \"stop\": [19]},\"thu\": {\"start\": [7], \"stop\": [2,19]}, \"fri\": {\"start\": [18], \"stop\": [9]}, \"sat\": {\"start\": [22]}, \"sun\": {\"stop\": [7]}}"
+  time = "Asia/Kolkata"
 }
