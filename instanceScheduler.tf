@@ -1,6 +1,6 @@
 resource "aws_cloudformation_stack" "instanceScheduler" {
   name = "Schedule"
-  capabilities = CAPABILITY_IAM
+  Capabilities = CAPABILITY_IAM
 template_body = <<STACK
 {
     "Parameters": {
