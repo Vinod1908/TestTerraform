@@ -547,11 +547,8 @@ template_body = <<STACK
         },
         "Regions": {
             "Type": "CommaDelimitedList",
+            "Default":"us-east-1",
             "Description": "List of regions in which instances are scheduled, leave blank for current region only."
-        },
-        "CrossAccountRoles": {
-            "Type": "CommaDelimitedList",
-            "Description": "Comma separated list of ARN's for cross account access roles. These roles must be created in all checked accounts the scheduler to start and stop instances."
         },
         "StartedTags": {
             "Type": "String",
