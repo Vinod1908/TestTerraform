@@ -767,9 +767,7 @@ template_body = <<STACK
                             "Sid": "default",
                             "Effect": "Allow",
                             "Principal": {
-                                "AWS": {
-                                    "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
-                                }
+                                "AWS": "arn:aws:iam::842856138791:root"
                             },
                             "Action": "kms:*",
                             "Resource": "*"
