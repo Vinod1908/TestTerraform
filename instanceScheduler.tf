@@ -608,7 +608,6 @@ template_body = <<STACK
                         "SchedulingActive",
                         "Regions",
                         "DefaultTimezone",
-                        "CrossAccountRoles",
                         "ScheduleLambdaAccount",
                         "SchedulerFrequency",
                         "MemorySize"
@@ -647,9 +646,6 @@ template_body = <<STACK
                 },
                 "SchedulingActive": {
                     "default": "Scheduling enabled"
-                },
-                "CrossAccountRoles": {
-                    "default": "Cross-account roles"
                 },
                 "ScheduleLambdaAccount": {
                     "default": "This account"
@@ -1497,9 +1493,6 @@ template_body = <<STACK
                 },
                 "regions": {
                     "Ref": "Regions"
-                },
-                "cross_account_roles": {
-                    "Ref": "CrossAccountRoles"
                 },
                 "schedule_lambda_account": {
                     "Fn::FindInMap": [
