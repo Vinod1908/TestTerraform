@@ -1568,4 +1568,5 @@ template_body = <<STACK
     }
 }
 STACK
+capabilities = CAPABILITY_IAM
   }
