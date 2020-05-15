@@ -1566,6 +1566,7 @@ template_body = <<STACK
             "Description": "Arn to use as ServiceToken property for custom resource type Custom::ServiceInstanceSchedule"
         }
     }
+capabilities = CAPABILITY_IAM
 }
 STACK
   }
