@@ -551,6 +551,11 @@ template_body = <<STACK
             "Default":"us-east-1",
             "Description": "List of regions in which instances are scheduled, leave blank for current region only."
         },
+        "CrossAccountRoles": {	
+            "Type": "CommaDelimitedList",	
+            "Default": null,
+            "Description": "Comma separated list of ARN's for cross account access roles. These roles must be created in all checked accounts the scheduler to start and stop instances."	
+        },
         "StartedTags": {
             "Type": "String",
             "Default":"schedStarted=true",
@@ -609,6 +614,7 @@ template_body = <<STACK
                         "SchedulingActive",
                         "Regions",
                         "DefaultTimezone",
+                        "CrossAccountRoles",
                         "ScheduleLambdaAccount",
                         "SchedulerFrequency",
                         "MemorySize"
@@ -647,6 +653,9 @@ template_body = <<STACK
                 },
                 "SchedulingActive": {
                     "default": "Scheduling enabled"
+                },
+                "CrossAccountRoles": {	
+                    "default": "Cross-account roles"	
                 },
                 "ScheduleLambdaAccount": {
                     "default": "This account"
@@ -1496,6 +1505,9 @@ template_body = <<STACK
                 },
                 "regions": {
                     "Ref": "Regions"
+                },
+                "cross_account_roles": {	
+                    "Ref": "CrossAccountRoles"	
                 },
                 "schedule_lambda_account": {
                     "Fn::FindInMap": [
