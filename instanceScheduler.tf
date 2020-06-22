@@ -553,7 +553,7 @@ template_body = <<STACK
         },
         "CrossAccountRoles": {	
             "Type": "CommaDelimitedList",	
-            "Default": ""
+            "Default": "",
             "Description": "Comma separated list of ARN's for cross account access roles. These roles must be created in all checked accounts the scheduler to start and stop instances."	
         },
         "StartedTags": {
