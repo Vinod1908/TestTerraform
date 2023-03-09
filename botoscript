@@ -1,0 +1,23 @@
+import boto3
+
+# Create EC2 client
+ec2 = boto3.client('ec2')
+
+# Retrieve list of instances
+response = ec2.describe_instances()
+
+# Extract instance IDs from response
+instance_ids = [reservation['Instances'][0]['InstanceId'] for reservation in response['Reservations'] for instance in reservation['Instances']]
+
+# Create tags for each instance
+for instance_id in instance_ids:
+    response = ec2.create_tags(
+        Resources=[instance_id],
+        Tags=[
+            {
+                'Key': 'myTag',
+                'Value': 'myValue'
+            },
+            # Add additional tags as necessary
+        ]
+    )
